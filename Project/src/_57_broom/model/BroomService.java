@@ -37,12 +37,13 @@ public class BroomService {
 	public int addOneRoom(Integer room_id) {
 		RoomVO rVo = roomDAO.findByPrimaryKey(room_id);
 		if (rVo == null) {
-			RoomTypeVO roomType = new RoomTypeVO();
-			roomType.setRoomType_id(1);
-			rVo.setRoomType(roomType);
+		    	rVo=new RoomVO();
+		    	RoomTypeDAO_interface rtDAO =new RoomTypeDAO();
+		    	System.out.println(rtDAO.findByPrimaryKey(1));
+			rVo.setRoomType(rtDAO.findByPrimaryKey(1));
 			rVo.setRoom_id(room_id);
 			rVo.setrStatus(true);
-			rVo.setRoom_type(new RoomTypeDAO().findByPrimaryKey(1).getRoom_type());
+			rVo.setRoom_type(rVo.getRoomType().getRoom_type());
 			rVo.setrContext("");
 			roomDAO.insert(rVo);
 			return 1;
@@ -51,33 +52,28 @@ public class BroomService {
 		}
 		return 0;
 	}
-
-	public void addListRooms() {
-
+	public int deleteOneRoom(int room_id) {
+	    RoomDAO_interface rDAO = new RoomDAO();
+	    if(rDAO.findByPrimaryKey(room_id)!=null){
+		rDAO.delete(room_id);
+		return 1;
+	    }
+	    return 0;
 	}
+	// 未使用
+//	public List<Integer> getAllRoomid() {
+//		List<RoomVO> list = roomDAO.getAll();
+//		List<Integer> roomids = new LinkedList<Integer>();
+//		for (RoomVO rVo : list) {
+//			roomids.add(rVo.getRoom_id());
+//		}
+//		return roomids;
+//	}
 
-	public void updateOneRoom() {
-
-	}
-
-	public void updateAllRoom() {
-
-	}
-
-	public List<Integer> getAllRoomid() {
-		List<RoomVO> list = roomDAO.getAll();
-		List<Integer> roomids = new LinkedList<Integer>();
-		for (RoomVO rVo : list) {
-			roomids.add(rVo.getRoom_id());
-		}
-		return roomids;
-	}
-
-	// 懶得打,先列min和max
-	public String getAllUnusedRoomid() {
-		List<Integer> list = getAllRoomid();
-		int min = list.get(0);
-		int max = list.get(list.size() - 1);
-		return null;
-	}
+//	public String getAllUnusedRoomid() {
+//		List<Integer> list = getAllRoomid();
+//		int min = list.get(0);
+//		int max = list.get(list.size() - 1);
+//		return null;
+//	}
 }

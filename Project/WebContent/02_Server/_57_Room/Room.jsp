@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>    
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -10,13 +10,12 @@
 <title>Insert title here</title>
 </head>
 <body>
-		<form name="myForm" id="myForm"
+	<form name="myForm" id="myForm"
 		action="<c:url value="/broom/broomeServlet"/>" method="post">
-		<input type="text" placeholder="roomId" name="roomId"> 
-		<input
-			type="submit" name="action" id='b1' value="listroom" />
-			<input type="button" value="AllSubmit" id="AllSubmit" name="AllSubmit" />
-			<input type="button" value="addOneRoom" id="addOneRoom" name="addOneRoom" />
+		<input type="text" placeholder="roomid" name="roomid" id="roomid">
+		<input type="submit" name="action" id='b1' value="listroom" /> <input
+			type="button" value="AllSubmit" id="AllSubmit" name="AllSubmit" /> <input
+			type="button" value="addOneRoom" id="addOneRoom" name="addOneRoom" />
 	</form>
 	<table class="table table-border">
 		<thead>
@@ -47,22 +46,21 @@
 		rooms.set("${room.room_id}", [ "${room.rStatus}", "${room.room_type}", "${room.rContext}" ]);
 		</c:forEach>
 		</c:if>
-//		console.log(rooms.get("101"));
+		//		console.log(rooms.get("101"));
 
 		//抓取el的roomTypeMap(編號&對應字串)轉為Map物件
 		<c:if test="${not empty roomTypeMap}">
 		var roomType = new Map();
 		<c:forEach var="roomType" items="${roomTypeMap}" >
-		roomType.set("${roomType.key}","${roomType.value}");
+		roomType.set("${roomType.key}", "${roomType.value}");
 		</c:forEach>
 		</c:if>
-		console.log(roomType.get("1"));
-		
+
 		$(function() {
 			//顯示全房間
 			callListroom();
 		});
-		
+
 		function callListroom() {
 			if (typeof (rooms) != "undefined") {
 				//清空Tbody
@@ -72,44 +70,54 @@
 				//綁定房況有無變化
 				$("#tb").on("change", "input:radio", rStatus);
 				//綁定房況資料變化
-				$("#tb").on("change", "input:text[name=rContext]", rContext); 
+				$("#tb").on("change", "input:text[name=rContext]", rContext);
 				//綁訂房型選單變化
 				$("#tb").on("change", "select[name=room_type]", room_type);
 				//綁定reset鈕
 				$("#tb").on("click", "a[name=res]", res);
 				//綁定submit鈕
-				$("#tb").on("click", "a[name=subOne]", subOne );
+				$("#tb").on("click", "a[name=subOne]", subOne);
+				//綁定delete鈕
+				$("#tb").on("click", "a[name=delOne]", delOne);
 				//全部送出
 				$("#AllSubmit").bind("click", AllSubmit);
 				//增加單筆房間
 				$("#addOneRoom").bind("click", addOneRoom);
-			};
+			}
+			;
 		}
 		
-		function addOneRoom(){
-			document.getElementById("imgLoad").style.display="inline";
-// 			var x = {};
-// 			x.action=this.name;
-			$.post('<c:url value="/broom/broomeServlet"/>',
-					'action=addOneRoom', 
-					function (data) {
-				document.getElementById("imgLoad").style.display="none";
-			})
+		function addOneRoom() {
+			document.getElementById("imgLoad").style.display = "inline";
+			var x = {};
+			x.action = 'addOneRoom';
+			x.room_id = $("#roomid").val();
+			console.log(x.room_id);
+			$.post('<c:url value="/broom/broomeServlet"/>', x, function(data) {
+// 				var y={};
+// 				y.action ='listroom';
+				//$.post('<c:url value="/broom/broomeServlet"/>', y);
+				window.location = '<c:url value="/broom/broomeServlet?action=listroom"/>';
+			}).fail(function() {
+				alert("新增失敗");
+			}).always(function() {
+				document.getElementById("imgLoad").style.display = "none";
+			});
 		}
-		
+
 		//參考老師的jQueryAjax, 動態產生Selector
-		function makeRoomTypeSelector(room_type){
+		function makeRoomTypeSelector(room_type) {
 			var cellSelector = $('<select name="room_type"></select>');
-				roomType.forEach(function(value,key,map){
-					var cell = $("<option>").val(key).text(value);
-					if($(cell).text()==room_type){
-						$(cell).attr("selected",true);
-					}
-					cellSelector.append(cell);
-				})
-				return cellSelector;
+			roomType.forEach(function(value, key, map) {
+				var cell = $("<option>").val(key).text(value);
+				if ($(cell).text() == room_type) {
+					$(cell).attr("selected", true);
+				}
+				cellSelector.append(cell);
+			})
+			return cellSelector;
 		}
-	
+
 		//val : ${room.rStatus}", "${room.room_type}", "${room.rContext}
 
 		//根據js的Map rooms顯示房間列表
@@ -123,14 +131,10 @@
 			var status1 = $("<input type=radio name=radio"+key+" value='true' />");
 			var status2 = $("<input type=radio name=radio"+key+" value='false' />");
 			var cell3 = $("<td name='rStatus'></td").append(status1).append("true").append(status2).append("False");
-			
-			//$("#dtest").append(cellSelector);
-			//var text4 = $("<input type='text' name='room_type'/>").val(value[1]);
-			//var cell4 = $("<td></td").append(text4);
-			
+
 			//將選擇器選擇對應room_type
 			var cellSelector = makeRoomTypeSelector(value[1]);
-		    var cell4 = $("<td></td").append(cellSelector);
+			var cell4 = $("<td></td").append(cellSelector);
 
 			var text5 = $("<input type='text' name='rContext'/>").val(value[2]);
 			var cell5 = $("<td></td").append(text5);
@@ -152,59 +156,72 @@
 			}
 
 		}
-		
+
 		//============預定把綁定區函數丟到這============
 		function rStatus() {
-					var id = $(this).parents("tr").attr("id");
-					rooms.get(id)[0] = $(this).val();
-					console.log(rooms.get(id));
-				}
-				function rContext() {
-					var id = $(this).parents("tr").attr("id");
-					rooms.get(id)[2] = $(this).val();
-					console.log(rooms.get(id));
-				}
-				function room_type() {
-					var id = $(this).parents("tr").attr("id");	
-					rooms.get(id)[1] = $(this).children("option:selected").text();
-					//console.log($(this).val());
-					console.log(rooms.get(id)[1]);
-				}
-				function res() {
-					var id = $(this).parents("tr").attr("id");
-					$("#" + eval(id) + " input:radio[value=" + roomsBackup.get(id)[0] + "]").prop("checked", true);
-					$("#" + eval(id) + " input:text[name=rContext]").val(roomsBackup.get(id)[2]);
-				}
-				function subOne() {
-					var id = $(this).parents("tr").attr("id");
-					var x = {};
-					x.action=this.name;
-					x.id=id;
-					x.rStatus=rooms.get(id)[0];
-					x.room_type=rooms.get(id)[1];
-					x.rContext=rooms.get(id)[2];
-					document.getElementById("imgLoad").style.display="inline";
-					$.post('<c:url value="/broom/broomeServlet"/>',x, function(data) {
-						document.getElementById("imgLoad").style.display="none";
-					});
-				}
-				function AllSubmit(){
-					document.getElementById("imgLoad").style.display="inline";
-					var x = {}, i=0;
-					x.action=this.name;
-					rooms.forEach(function(value,key,map){
-						x["room_id"+i]=key;
-						x["rStatus"+i]=value[0];
-						x["rContext"+i]=value[2];
-						i++;
-					});
-					x.number=i;
-					$.post('<c:url value="/broom/broomeServlet"/>',
-							x, 
-							function(data) {
-						document.getElementById("imgLoad").style.display="none";
-					});
-				}
+			var id = $(this).parents("tr").attr("id");
+			rooms.get(id)[0] = $(this).val();
+			console.log(rooms.get(id));
+		}
+		function rContext() {
+			var id = $(this).parents("tr").attr("id");
+			rooms.get(id)[2] = $(this).val();
+			console.log(rooms.get(id));
+		}
+		function room_type() {
+			var id = $(this).parents("tr").attr("id");
+			rooms.get(id)[1] = $(this).children("option:selected").text();
+			//console.log($(this).val());
+			console.log(rooms.get(id)[1]);
+		}
+		function res() {
+			var id = $(this).parents("tr").attr("id");
+			$("#" + eval(id) + " input:radio[value=" + roomsBackup.get(id)[0] + "]").prop("checked", true);
+			$("#" + eval(id) + " input:text[name=rContext]").val(roomsBackup.get(id)[2]);
+		}
+		function subOne() {
+			var id = $(this).parents("tr").attr("id");
+			var x = {};
+			x.action = this.name;
+			x.id = id;
+			x.rStatus = rooms.get(id)[0];
+			x.room_type = rooms.get(id)[1];
+			x.rContext = rooms.get(id)[2];
+			document.getElementById("imgLoad").style.display = "inline";
+			$.post('<c:url value="/broom/broomeServlet"/>', x).fail(function() {
+				alert("新增失敗");
+			}).always(function() {
+				document.getElementById("imgLoad").style.display = "none";
+			});
+		}
+		function delOne() {
+			var id = $(this).parents("tr").attr("id");
+			var x = {};
+			x.action = this.name;
+			x.id = id;
+			document.getElementById("imgLoad").style.display = "inline";
+			$.post('<c:url value="/broom/broomeServlet"/>', x, function(data) {
+				document.getElementById("imgLoad").style.display = "none";
+				$("#" + id).remove();
+			});
+		}
+		function AllSubmit() {
+			document.getElementById("imgLoad").style.display = "inline";
+			var x = {}, i = 0;
+			x.action = this.name;
+			rooms.forEach(function(value, key, map) {
+				x["room_id" + i] = key;
+				x["rStatus" + i] = value[0];
+				x["room_type" + i] = value[1];
+				console.log(value[1]);
+				x["rContext" + i] = value[2];
+				i++;
+			});
+			x.number = i;
+			$.post('<c:url value="/broom/broomeServlet"/>', x, function(data) {
+				document.getElementById("imgLoad").style.display = "none";
+			});
+		}
 	</script>
 </body>
 </html>

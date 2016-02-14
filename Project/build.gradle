@@ -9,8 +9,8 @@ repositories {
 	mavenCentral()					//使用maven  central repository
 }
 dependencies {						//宣告dependency library
-	//runtime files('../../lib/sqljdbc42.jar')
-	runtime files('../sqljdbc4.jar')
+	runtime files('../../lib/sqljdbc4.jar')
+	//runtime files('../sqljdbc4.jar')
 	compile 'org.hibernate:hibernate-core:4.3.11.Final'
 	providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
 	providedRuntime 'javax.servlet:jstl:1.2'
