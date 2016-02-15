@@ -13,9 +13,11 @@
 	<form name="myForm" id="myForm"
 		action="<c:url value="/broom/broomeServlet"/>" method="post">
 		<input type="text" placeholder="roomid" name="roomid" id="roomid">
+		<input type="text" placeholder="roomid2" name="roomid2" id="roomid2">
 		<input type="submit" name="action" id='b1' value="listroom" /> <input
 			type="button" value="AllSubmit" id="AllSubmit" name="AllSubmit" /> <input
-			type="button" value="addOneRoom" id="addOneRoom" name="addOneRoom" />
+			type="button" value="addRoom" id="addRoom" name="addRoom" />
+			<input type="button" value="delRoom" id="delRoom" name="delRoom" />
 	</form>
 	<table class="table table-border">
 		<thead>
@@ -81,28 +83,41 @@
 				$("#tb").on("click", "a[name=delOne]", delOne);
 				//全部送出
 				$("#AllSubmit").bind("click", AllSubmit);
-				//增加單筆房間
-				$("#addOneRoom").bind("click", addOneRoom);
+				//增加單筆&批次房間
+				$("#addRoom").bind("click", addRoom);
+				//刪除單筆&批次房間
+				$("#delRoom").bind("click", delRoom);
 			}
 			;
 		}
-		
-		function addOneRoom() {
+
+		function addRoom() {
 			document.getElementById("imgLoad").style.display = "inline";
 			var x = {};
-			x.action = 'addOneRoom';
+			x.action = 'addRoom';
 			x.room_id = $("#roomid").val();
-			console.log(x.room_id);
+			x.room_id2 = $("#roomid2").val();
 			$.post('<c:url value="/broom/broomeServlet"/>', x, function(data) {
-// 				var y={};
-// 				y.action ='listroom';
-				//$.post('<c:url value="/broom/broomeServlet"/>', y);
 				window.location = '<c:url value="/broom/broomeServlet?action=listroom"/>';
 			}).fail(function() {
 				alert("新增失敗");
 			}).always(function() {
 				document.getElementById("imgLoad").style.display = "none";
 			});
+		}
+		function delRoom(){
+			document.getElementById("imgLoad").style.display = "inline";
+			var x = {};
+			x.action = 'delRoom';
+			x.room_id = $("#roomid").val();
+			x.room_id2 = $("#roomid2").val();
+			$.post('<c:url value="/broom/broomeServlet"/>', x, function(data) {
+				window.location = '<c:url value="/broom/broomeServlet?action=listroom"/>';
+			}).fail(function() {
+				alert("刪除失敗,請洽管理員");
+			}).always(function() {
+				document.getElementById("imgLoad").style.display = "none";
+			});	
 		}
 
 		//參考老師的jQueryAjax, 動態產生Selector
@@ -201,8 +216,9 @@
 			x.id = id;
 			document.getElementById("imgLoad").style.display = "inline";
 			$.post('<c:url value="/broom/broomeServlet"/>', x, function(data) {
-				document.getElementById("imgLoad").style.display = "none";
 				$("#" + id).remove();
+			}).always(function() {
+				document.getElementById("imgLoad").style.display = "none";
 			});
 		}
 		function AllSubmit() {
@@ -219,6 +235,8 @@
 			});
 			x.number = i;
 			$.post('<c:url value="/broom/broomeServlet"/>', x, function(data) {
+				document.getElementById("imgLoad").style.display = "none";
+			}).always(function() {
 				document.getElementById("imgLoad").style.display = "none";
 			});
 		}
